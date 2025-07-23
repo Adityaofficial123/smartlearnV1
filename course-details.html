@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details - SmartLearn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold text-blue-600">SmartLearn</a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-700 hover:text-blue-600 transition-colors">Home</a>
+                    <a href="courses.html" class="text-gray-700 hover:text-blue-600 transition-colors">Courses</a>
+                    <a href="my-courses.html" class="text-gray-700 hover:text-blue-600 transition-colors">My Learning</a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div id="auth-buttons" class="flex items-center space-x-2">
+                        <button id="login-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Login with Google
+                        </button>
+                    </div>
+                    <div id="user-info" class="hidden flex items-center space-x-2">
+                        <span id="user-name" class="text-gray-700 font-medium"></span>
+                        <button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Course Details -->
+    <section class="pt-16">
+        <div id="loading" class="text-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="mt-4 text-gray-600">Loading course details...</p>
+        </div>
+
+        <div id="course-content" class="hidden">
+            <!-- Course Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h1 id="course-title" class="text-4xl md:text-5xl font-bold mb-4"></h1>
+                            <p id="course-description" class="text-xl opacity-90 mb-6"></p>
+                            <div class="flex items-center space-x-4 mb-6">
+                                <div class="flex items-center">
+                                    <div id="course-rating" class="flex text-yellow-400 mr-2"></div>
+                                    <span id="rating-text" class="text-sm opacity-75"></span>
+                                </div>
+                                <span id="course-students" class="text-sm opacity-75"></span>
+                            </div>
+                            <p class="text-lg">By <span id="course-instructor" class="font-semibold"></span></p>
+                        </div>
+                        <div class="text-center">
+                            <img id="course-image" src="" alt="Course" class="rounded-lg shadow-2xl max-w-full h-auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Info -->
+            <div class="py-12">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <!-- Main Content -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                                <h2 class="text-2xl font-bold mb-4">What you'll learn</h2>
+                                <ul id="course-objectives" class="space-y-2">
+                                    <!-- Objectives will be loaded dynamically -->
+                                </ul>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                                <h2 class="text-2xl font-bold mb-4">Course Content</h2>
+                                <div id="course-curriculum" class="space-y-4">
+                                    <!-- Curriculum will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow-lg p-8">
+                                <h2 class="text-2xl font-bold mb-4">About the Instructor</h2>
+                                <div class="flex items-start space-x-4">
+                                    <img id="instructor-image" src="" alt="Instructor" class="w-16 h-16 rounded-full">
+                                    <div>
+                                        <h3 id="instructor-name" class="text-xl font-semibold mb-2"></h3>
+                                        <p id="instructor-bio" class="text-gray-600"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div>
+                            <div class="bg-white rounded-lg shadow-lg p-8 sticky top-24">
+                                <div class="text-center mb-6">
+                                    <div id="price-section">
+                                        <span id="course-price" class="text-3xl font-bold text-blue-600"></span>
+                                    </div>
+                                </div>
+
+                                <button id="enroll-btn" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors mb-4">
+                                    Enroll Now
+                                </button>
+
+                                <div id="enrollment-status" class="hidden text-center p-4 bg-green-100 text-green-800 rounded-lg mb-4">
+                                    ✓ You are enrolled in this course
+                                </div>
+
+                                <div class="space-y-4 text-sm text-gray-600">
+                                    <div class="flex justify-between">
+                                        <span>Duration:</span>
+                                        <span id="course-duration"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Level:</span>
+                                        <span id="course-level"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Category:</span>
+                                        <span id="course-category"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Language:</span>
+                                        <span>English</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Certificate:</span>
+                                        <span>Yes</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold mb-6 text-center">Welcome to SmartLearn</h2>
+            <button id="google-login" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continue with Google
+            </button>
+            <button id="close-modal" class="mt-4 w-full text-gray-500 hover:text-gray-700">Close</button>
+        </div>
+    </div>
+
+    <script src="firebase.js"></script>
+    <script>
+        let currentCourse = null;
+        let currentUser = null;
+
+        // Get course ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('id');
+
+        // Load course details
+        async function loadCourseDetails() {
+            if (!courseId) {
+                window.location.href = 'courses.html';
+                return;
+            }
+
+            try {
+                const courseDoc = await db.collection('courses').doc(courseId).get();
+                if (!courseDoc.exists) {
+                    throw new Error('Course not found');
+                }
+
+                currentCourse = { id: courseDoc.id, ...courseDoc.data() };
+                displayCourseDetails(currentCourse);
+                checkEnrollmentStatus();
+            } catch (error) {
+                console.error('Error loading course:', error);
+                alert('Error loading course details');
+            }
+        }
+
+        function displayCourseDetails(course) {
+            document.getElementById('course-title').textContent = course.title;
+            document.getElementById('course-description').textContent = course.description;
+            document.getElementById('course-instructor').textContent = course.instructor;
+            document.getElementById('course-image').src = course.image;
+            document.getElementById('course-duration').textContent = course.duration;
+            document.getElementById('course-level').textContent = course.level;
+            document.getElementById('course-category').textContent = course.category;
+
+            // Rating
+            const ratingElement = document.getElementById('course-rating');
+            ratingElement.innerHTML = generateStarRating(course.rating);
+            document.getElementById('rating-text').textContent = `${course.rating} (${course.reviews} reviews)`;
+            document.getElementById('course-students').textContent = `${course.students} students`;
+
+            // Price
+            const priceElement = document.getElementById('course-price');
+            if (course.price === 0) {
+                priceElement.textContent = 'Free';
+                priceElement.className = 'text-3xl font-bold text-green-600';
+            } else {
+                priceElement.textContent = `$${course.price}`;
+            }
+
+            // Objectives
+            const objectivesElement = document.getElementById('course-objectives');
+            objectivesElement.innerHTML = course.objectives.map(obj => 
+                `<li class="flex items-start"><span class="text-green-500 mr-2">✓</span>${obj}</li>`
+            ).join('');
+
+            // Curriculum
+            const curriculumElement = document.getElementById('course-curriculum');
+            curriculumElement.innerHTML = course.curriculum.map((section, index) => 
+                `<div class="border border-gray-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-lg mb-2">Section ${index + 1}: ${section.title}</h3>
+                    <p class="text-gray-600 mb-2">${section.description}</p>
+                    <div class="text-sm text-gray-500">${section.lessons} lessons • ${section.duration}</div>
+                </div>`
+            ).join('');
+
+            // Instructor
+            document.getElementById('instructor-name').textContent = course.instructor;
+            document.getElementById('instructor-image').src = course.instructorImage || 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=400';
+            document.getElementById('instructor-bio').textContent = course.instructorBio || 'Experienced instructor with years of industry experience.';
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('course-content').classList.remove('hidden');
+        }
+
+        async function checkEnrollmentStatus() {
+            if (!currentUser || !currentCourse) return;
+
+            try {
+                const enrollmentDoc = await db.collection('enrollments')
+                    .where('userId', '==', currentUser.uid)
+                    .where('courseId', '==', currentCourse.id)
+                    .get();
+
+                if (!enrollmentDoc.empty) {
+                    document.getElementById('enroll-btn').style.display = 'none';
+                    document.getElementById('enrollment-status').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error checking enrollment:', error);
+            }
+        }
+
+        // Enrollment
+        document.getElementById('enroll-btn').addEventListener('click', async function() {
+            if (!currentUser) {
+                showLoginModal();
+                return;
+            }
+
+            if (!currentCourse) return;
+
+            try {
+                // Add enrollment
+                await db.collection('enrollments').add({
+                    userId: currentUser.uid,
+                    courseId: currentCourse.id,
+                    enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    progress: 0,
+                    completed: false
+                });
+
+                // Update course students count
+                await db.collection('courses').doc(currentCourse.id).update({
+                    students: firebase.firestore.FieldValue.increment(1)
+                });
+
+                alert('Successfully enrolled in the course!');
+                checkEnrollmentStatus();
+            } catch (error) {
+                console.error('Error enrolling:', error);
+                alert('Error enrolling in course');
+            }
+        });
+
+        // Authentication state listener
+        firebase.auth().onAuthStateChanged(function(user) {
+            currentUser = user;
+            updateAuthUI(user);
+            checkEnrollmentStatus();
+        });
+
+        // Initialize
+        loadCourseDetails();
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
