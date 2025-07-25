@@ -344,6 +344,37 @@ nav.blur {
   }
 }
 
+/* Course content specific styles */
+.content-tab.active {
+  border-bottom-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.section-item button.active {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* Video modal styles */
+.aspect-video {
+  aspect-ratio: 16 / 9;
+}
+
+/* File type icons */
+.file-icon {
+  font-size: 1.5rem;
+}
+
+/* Progress indicator */
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.35s;
+  transform-origin: 50% 50%;
+}
+
 /* Dark mode support preparation */
 @media (prefers-color-scheme: dark) {
   /* Future dark mode styles can be added here */

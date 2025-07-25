@@ -68,7 +68,8 @@ const sampleCourses = [
       }
     ],
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    featured: true
+    featured: true,
+    hasContent: true
   },
   {
     title: "Python for Data Science",
@@ -118,7 +119,8 @@ const sampleCourses = [
       }
     ],
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    featured: true
+    featured: true,
+    hasContent: true
   },
   {
     title: "Digital Marketing Mastery",
@@ -168,7 +170,8 @@ const sampleCourses = [
       }
     ],
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    featured: true
+    featured: true,
+    hasContent: true
   },
   {
     title: "UI/UX Design Fundamentals",

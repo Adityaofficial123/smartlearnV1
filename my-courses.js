@@ -182,7 +182,12 @@ function createEnrolledCourseCard(course) {
         </div>
         
         <div class="flex items-center justify-between">
-          ${actionButton}
+          <div class="flex space-x-2">
+            ${actionButton}
+            <a href="course-content.html?id=${course.courseId}" class="bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-semibold">
+              View Content
+            </a>
+          </div>
           <a href="course-details.html?id=${course.courseId}" class="text-blue-600 hover:text-blue-700 transition-colors text-sm font-semibold">
             View Details
           </a>
